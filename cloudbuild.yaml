@@ -1,35 +1,39 @@
 steps:
 
 # Login to Docker Hub
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker login --username=${_DOCKER_USER_NAME} --password=$$DOCKER_USER_PASSWORD']
-    secretEnv: ['DOCKER_USER_PASSWORD']
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args: ['-c', 'docker login --username=${_DOCKER_USER_NAME} --password=$$DOCKER_USER_PASSWORD']
+  secretEnv: ['DOCKER_USER_PASSWORD']
 # Build new image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
    
 # Push to Docker Hub
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
 
 # Edit the kubernetes deployment file with the new image
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: /bin/sh
-    secretEnv: ['GIT_ACCESS_TOKEN']
-    args:
-      - '-c'
-      - |
-        git clone https://github.com/${_GIT_USER}/${_GIT_REPO}.git -b ${_CD_BRANCH}
-        echo "Updating image tag version ..."
-        cd ${_KUBE_CONF_DIR}
-        sed "s%IMAGE_TAG%${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA%g" deployment.yaml.template > deployment.yaml
-        echo "Pushing changes to k8s manifest repo ..."
-        git config --global user.name ${_GIT_USER}
-        git config --global user.email ${_GIT_USER_EMAIL}
-        git add -A
-        git commit -m "[Cloud Builder] Updated image tag a $DOCKER_USER_NAME/${_DOCKER_REPO}:$SHORT_SHA from commit $COMMIT_SHA" 
-        git push https://${_GIT_USER}:$$GIT_ACCESS_TOKEN@github.com/${_GIT_USER}/${_GIT_REPO}.git ${_CD_BRANCH}
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: /bin/sh
+  secretEnv: ['GIT_ACCESS_TOKEN']
+  args:
+    - '-c'
+    - |
+      git clone https://github.com/${_GIT_USER}/${_GIT_REPO}.git -b ${_CD_BRANCH}
+      echo "Updating image tag version ..."
+      cd ${_KUBE_CONF_DIR}
+      sed "s%IMAGE_TAG%${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA%g" deployment.yaml.template > deployment.yaml
+      echo "Pushing changes to k8s manifest repo ..."
+      git config --global user.name ${_GIT_USER}
+      git config --global user.email ${_GIT_USER_EMAIL}
+      git add -A
+      git commit -m "[Cloud Builder] Updated image tag a $DOCKER_USER_NAME/${_DOCKER_REPO}:$SHORT_SHA from commit $COMMIT_SHA" 
+      git push https://${_GIT_USER}:$$GIT_ACCESS_TOKEN@github.com/${_GIT_USER}/${_GIT_REPO}.git ${_CD_BRANCH}
+
+# Store logs in Cloud Logging only
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 # Get git token        
 availableSecrets:
