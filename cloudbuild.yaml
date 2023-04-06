@@ -28,7 +28,7 @@ steps:
       git config --global user.name ${_GIT_USER}
       git config --global user.email ${_GIT_USER_EMAIL}
       git add -A
-      git commit -m "[Cloud Builder] Updated image tag a $DOCKER_USER_NAME/${_DOCKER_REPO}:$SHORT_SHA from commit $COMMIT_SHA" 
+      git commit -m "[Cloud Builder] Updated image tag a ${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA from commit $COMMIT_SHA" 
       git push https://${_GIT_USER}:$$GIT_ACCESS_TOKEN@github.com/${_GIT_USER}/${_GIT_REPO}.git ${_CD_BRANCH}
 
 # Store logs in Cloud Logging only
