@@ -7,11 +7,11 @@ steps:
   secretEnv: ['DOCKER_USER_PASSWORD']
 # Build new image
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
+  args: ['build', '-t', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.']
    
 # Push to Docker Hub
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA', '.' ]
+  args: ['docker', 'push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA']
 
 # Edit the kubernetes deployment file with the new image
 - name: 'gcr.io/cloud-builders/gcloud'
