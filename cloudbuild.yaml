@@ -38,8 +38,8 @@ options:
 # Get git token        
 availableSecrets:
   secretManager:
-  - versionName: projects/$PROJECT_NUMBER/secrets/github-access-token
+  - versionName: projects/$PROJECT_NUMBER/secrets/github-access-token/versions/latest
     env: 'GIT_ACCESS_TOKEN'
-  - versionName: projects/$PROJECT_NUMBER/secrets/docker-user-password
+  - versionName: projects/$PROJECT_NUMBER/secrets/docker-user-password/versions/latest
     env: 'DOCKER_USER_PASSWORD'
   
