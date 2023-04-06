@@ -11,7 +11,7 @@ steps:
    
 # Push to Docker Hub
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['docker', 'push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA']
+  args: ['push', '${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA']
 
 # Edit the kubernetes deployment file with the new image
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -22,7 +22,7 @@ steps:
     - |
       git clone https://github.com/${_GIT_USER}/${_GIT_REPO}.git -b ${_CD_BRANCH}
       echo "Updating image tag version ..."
-      cd ${_KUBE_CONF_DIR}
+      cd ${_GIT_REPO}/${_KUBE_CONF_DIR}
       sed "s%IMAGE_TAG%${_DOCKER_USER_NAME}/${_DOCKER_REPO}:$SHORT_SHA%g" deployment.yaml.template > deployment.yaml
       echo "Pushing changes to k8s manifest repo ..."
       git config --global user.name ${_GIT_USER}
